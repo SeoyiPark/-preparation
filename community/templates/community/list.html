@@ -19,9 +19,8 @@
         <!-- 상단 컨트롤러 (카테고리 필터 & 통합 검색창 & 드롭다운 & 글쓰기 버튼) -->
         <div class="flex items-center justify-between mb-6 gap-4">
             
-            <!-- 왼쪽: 카테고리 셀렉트박스 (onchange 시 바로 폼이 전송되도록 수정) -->
-            <!-- 💡 [수정] value 분기 조건을 question->qna, share->info로 올바르게 교체 -->
-            <select name="board_type" onchange="this.form.submit()"
+            <!-- 왼쪽: 카테고리 셀렉트박스 (★ onclick 대신 복합적인 이벤트 처리를 위해 스크립트 수정) -->
+            <select name="board_type" id="board-type-select" onchange="handleBoardTypeChange(this)"
                 class="bg-gray-50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-2.5 dark:bg-gray-800 transition shrink-0 cursor-pointer">
                 <option value="all" {% if current_type == 'all' %}selected{% endif %}>전체 게시판</option>
                 <option value="notice" {% if current_type == 'notice' %}selected{% endif %}>공지 사항</option>
@@ -33,7 +32,8 @@
             <!-- 중앙 통합 검색창 -->
             <div class="flex-1 max-w-md mx-2">
                 <div class="relative">
-                    <input type="text" name="q" value="{{ search_query }}" placeholder="제목, 내용, 작성자 검색..." 
+                    <!-- ★ id="search-input" 속성을 추가하여 스크립트에서 쉽게 제어할 수 있도록 함 -->
+                    <input type="text" id="search-input" name="q" value="{{ search_query }}" placeholder="제목, 내용, 작성자 검색..." 
                            class="w-full pl-4 pr-16 py-2.5 bg-gray-50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 text-sm rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-800 transition outline-none">
                     
                     <!-- 검색어가 존재할 때만 노출되는 우측 X (초기화) 버튼 -->
@@ -108,8 +108,25 @@
                     <td class="px-6 py-4">
                         <a href="{% url 'community:post_detail' post.pk %}?board_type={{ current_type }}&per_page={{ per_page }}&page={{ posts.number }}&q={{ search_query|urlencode }}" class="text-gray-900 dark:text-white font-medium hover:text-purple-600 transition">
                             {{ post.title }}
+                            {% if post.comment_count > 0 %}
+                                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 ml-1" title="댓글 개수">[{{ post.comment_count }}]</span>
+                            {% endif %}
                         </a>
                         {% if post.image %} <span class="text-xs ml-1">📷</span> {% endif %}
+
+                        <!-- ⭐️ N 뱃지 (찐 깜빡이) -->
+                        {% if post.is_new %}
+                            <span class="inline-flex items-center justify-center ml-1
+                                         w-[14px] h-[14px]
+                                         text-[8px] font-extrabold text-white
+                                         bg-red-500 rounded-[4px]
+                                         select-none -translate-y-[1px]
+                                         badge-blink"
+                                  style="line-height:1"
+                                  title="새로운 글">
+                                N
+                            </span>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4 text-center text-gray-500">{{ post.author.username }}</td>
                     <td class="px-6 py-4 text-center text-gray-400">{{ post.created_at|date:"m.d" }}</td>
@@ -128,14 +145,12 @@
     <!-- 하단 페이징 영역 -->
     <div class="flex justify-center items-center gap-1.5 my-10">
         
-        <!-- 맨 처음으로 (<<) -->
         {% if posts.has_previous %}
             <a href="?board_type={{ current_type }}&per_page={{ per_page }}&page=1&q={{ search_query|urlencode }}" 
                class="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 hover:text-purple-600 dark:hover:text-purple-400 transition" 
                title="처음 페이지">
                 &laquo;
             </a>
-            <!-- 이전으로 (<) -->
             <a href="?board_type={{ current_type }}&per_page={{ per_page }}&page={{ posts.previous_page_number }}&q={{ search_query|urlencode }}" 
                class="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 hover:text-purple-600 dark:hover:text-purple-400 transition" 
                title="이전 페이지">
@@ -143,7 +158,6 @@
             </a>
         {% endif %}
 
-        <!-- 페이지 번호들 -->
         {% for num in posts.paginator.page_range %}
             {% if posts.number == num %}
                 <span class="flex items-center justify-center w-9 h-9 rounded-xl bg-purple-600 text-white font-bold shadow-sm">
@@ -157,14 +171,12 @@
             {% endif %}
         {% endfor %}
 
-        <!-- 다음으로 (>) -->
         {% if posts.has_next %}
             <a href="?board_type={{ current_type }}&per_page={{ per_page }}&page={{ posts.next_page_number }}&q={{ search_query|urlencode }}" 
                class="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 hover:text-purple-600 dark:hover:text-purple-400 transition" 
                title="다음 페이지">
                 &gt;
             </a>
-            <!-- 맨 끝으로 (>>) -->
             <a href="?board_type={{ current_type }}&per_page={{ per_page }}&page={{ posts.paginator.num_pages }}&q={{ search_query|urlencode }}" 
                class="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 hover:text-purple-600 dark:hover:text-purple-400 transition" 
                title="마지막 페이지">
@@ -175,8 +187,55 @@
     </div>
 </div>
 
-<!-- 스크립트 보완 (기존 검색 조건을 파괴하지 않도록 URLSearchParams 정밀화) -->
+<!-- ✅ 깜빡이 스타일 -->
+<style>
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.badge-blink {
+    animation: blink 1s step-start infinite;
+}
+</style>
+
+<!-- 스크립트 영역 -->
 <script>
+const selectEl = document.getElementById('board-type-select');
+let isOpen = false;
+
+selectEl.addEventListener('click', function() {
+    isOpen = !isOpen;
+});
+
+selectEl.addEventListener('blur', function() {
+    isOpen = false;
+});
+
+selectEl.addEventListener('mouseup', function(e) {
+    if (isOpen) {
+        setTimeout(() => {
+            const searchInput = document.getElementById('search-input');
+            
+            if (selectEl.value === 'all' && searchInput && searchInput.value.trim() !== '') {
+                searchInput.value = '';
+                selectEl.form.submit();
+            }
+            isOpen = false;
+        }, 50);
+    }
+});
+
+function handleBoardTypeChange(selectElement) {
+    if (selectElement.value === 'all') {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+    }
+    selectElement.form.submit();
+}
+
 function changePerPage(value) {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('per_page', value);
