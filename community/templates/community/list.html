@@ -18,9 +18,9 @@
             class="bg-gray-50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-2.5 dark:bg-gray-800 transition shrink-0">
             <option value="all" {% if current_type == 'all' %}selected{% endif %}>전체 게시판</option>
             <option value="notice" {% if current_type == 'notice' %}selected{% endif %}>공지 사항</option>
-            <option value="question" {% if current_type == 'question' %}selected{% endif %}>질문 답변</option>
+            <option value="qna" {% if current_type == 'qna' %}selected{% endif %}>질문 답변</option>
             <option value="free" {% if current_type == 'free' %}selected{% endif %}>자유 게시판</option>
-            <option value="share" {% if current_type == 'share' %}selected{% endif %}>정보 공유</option>
+            <option value="info" {% if current_type == 'info' %}selected{% endif %}>정보 공유</option>
         </select>
 
         <!-- 💡 [수정] 중앙 통합 검색창 내부에 'X' 버튼 추가 (방법 1) -->

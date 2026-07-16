@@ -20,9 +20,12 @@
                 <!-- 카테고리 선택 드롭다운 -->
                 <div class="w-full md:w-1/4 flex-shrink-0">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">카테고리</label>
-                    <select name="board_type" 
+                    <select name="board_type" required
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block dark:bg-gray-700 transition cursor-pointer">
+                        <option value="" selected disabled>카테고리를 선택하세요</option>
+                        {% if user.is_staff %}
                         <option value="notice">공지 사항</option>
+                        {% endif %}
                         <option value="qna">질문 답변</option>
                         <option value="free">자유 게시판</option>
                         <option value="info">정보 공유</option>
