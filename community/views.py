@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count, Q
 from django.core.paginator import Paginator
@@ -73,7 +74,8 @@ def post_create(request):
 
         # 공지사항은 관리자만 작성 가능
         if board_type == 'notice' and not request.user.is_staff:
-            return redirect('community:board_list')
+            messages.error(request, '공지 사항은 관리자만 작성할 수 있습니다. 카테고리를 다시 선택해 주세요.')
+            return redirect('community:post_create')
 
         # 에디터 데이터를 포함한 전체 Post 생성
         Post.objects.create(
