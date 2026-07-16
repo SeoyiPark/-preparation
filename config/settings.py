@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'deal.apps.DealConfig',
     'works.apps.WorksConfig',
     'community.apps.CommunityConfig',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 
@@ -148,4 +150,5 @@ CHANNEL_LAYERS = {
     },
 }
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'works'
+MEDIA_ROOT = BASE_DIR / 'media'
+CKEDITOR_UPLOAD_PATH = 'uploads/'
