@@ -13,3 +13,4 @@ node_modules/
 
 # 환경 변수 (보안)
 .env
+static/css/output.css
