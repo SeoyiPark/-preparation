@@ -32,15 +32,19 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'anime',
     'accounts',
     'deal.apps.DealConfig',
+    'works.apps.WorksConfig',
     'community.apps.CommunityConfig',
     'ckeditor',
     'ckeditor_uploader',
@@ -66,6 +70,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -75,6 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -133,16 +139,16 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-LOGIN_URL = '/accounts/login/'
-
-
-# Media 파일(사용자가 업로드하는 파일) 기본 설정이 없다면 먼저 추가
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # 또는 Path(BASE_DIR) / 'media' (장고 버전에 맞게)
-
-# CKEditor가 요구하는 에러 메시지 속 그 설정!
+MEDIA_ROOT = BASE_DIR / 'media'
 CKEDITOR_UPLOAD_PATH = 'uploads/'
